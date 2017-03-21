@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdtower.mapper.AreaMapper">
+
+	<select id="getAreas" parameterType="map"
+		resultType="com.sdtower.common.bean.Area">
+		select
+		ROW_NUMBER()over(order by a.ID asc) rownumber,  
+		a.ID as id,
+		a.area_name as areaname,
+		a.area_id as areaid,
+		a.City_id as cityid,
+		c.City_name as cityname
+		from
+		tower_area a
+		left join
+		tower_city c on a.City_id=c.City_id
+		where 1=1
+		<if test="cityid!=null and city!=''">
+			and a.City_id=#{cityid}
+		</if>
+		<if test="areaids!=null">
+		 and a.ID in (
+		 <foreach collection="areaids" item="id" separator=",">
+		  #{id}
+		 </foreach>
+		 )
+		</if>
+		order by rownumber asc
+
+		;
+	</select>
+	
+	
+		<select id="getOtherAreas" parameterType="map"
+		resultType="com.sdtower.common.bean.Area">
+		select
+		a.ID as id,
+		a.area_name as areaname,
+		a.area_id as areaid,
+		a.City_id as cityid,
+		c.City_name as cityname
+		from
+		tower_area a
+		left join
+		tower_city c on a.City_id=c.City_id
+		where 1=1
+		<if test="cityid!=null and city!=''">
+			and a.City_id=#{cityid}
+		</if>
+		<if test="areaids!=null">
+		 and a.ID not in (
+		 <foreach collection="areaids" item="id" separator=",">
+		  #{id}
+		 </foreach>
+		 )
+		</if>
+		order by a.ID asc
+
+		;
+	</select>
+	
+	
+
+	<select id="getCitys" parameterType="map"
+		resultType="com.sdtower.common.bean.City">
+		select
+		ROW_NUMBER()over(order by c.id asc) rownumber,  
+		
+		c.City_id as cityid,
+		c.City_name as cityname
+		from
+		tower_city c
+		where 1=1
+		<if test="cityid!=null and cityid!=''">
+			and c.City_id=#{cityid}
+		</if>
+		<if test="cityids!=null">
+		and c.City_id in (
+		  <foreach collection="cityids" item="city" separator=",">
+		    #{city}
+		  </foreach>
+		  )
+		</if>
+		order by rownumber asc
+
+		;
+	</select>
+
+	<select id="getAreasByOpenid" parameterType="map"
+		resultType="com.sdtower.common.bean.Area">
+		select
+		a.ID as id,
+		a.area_name as areaname,
+		a.area_id as
+		areaid,
+		a.City_id as cityid,
+		c.City_name as cityname
+		from
+		tower_area a
+		left join tower_city c on a.City_id=c.City_id
+		left join tower_user_info
+		u on u.User_area=a.area_id
+		where 1=1
+		and u.Wx_id=#{openid}
+		;
+	</select>
+
+	<select id="getAreaByCityNameAndAreaName" parameterType="map" resultType="com.sdtower.common.bean.Area">
+		select
+		a.ID as id,
+		City_id as cityid
+		
+		from tower_area a
+		where a.area_name=#{areaname}
+		and a.City_id=(select City_id from tower_city c where
+		c.City_name=#{cityname});
+
+	</select>
+	<select id="getCityname" parameterType="String" resultType="map">
+	  select City_name
+	  from tower_city
+	  where City_id=#{cityid}
+	  ;
+	</select>
+
+   
+
+</mapper>

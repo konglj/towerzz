@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sdtower.mapper.TowerShInfoMapper">
+<!-- 获取用户信息 -->
+	<select id="getShInfos" parameterType="int"
+		resultType="com.sdtower.common.bean.TowerShInfo">
+	   select 
+	   ID as id,
+	   Order_id as orderid,
+	   Order_user as orderuser,
+	   Order_name as ordername,
+	   Order_phone as orderphone,
+	   case Order_type
+	   when 1 then '用户'
+	   when 2 then '管理员'
+	    end as ordertypename,
+	   case Order_state
+		when 0 then '抢单'
+		when 1 then
+		'弃单'
+		when 2 then '交单'
+		when 3 then '审核拒绝'
+		when 4 then '审核成功(签约)'
+		when 5
+		then '付首款审核中'
+		when 6 then '付首款审核成功'
+		when 7 then '付首款审核拒绝'
+		when 8 then
+		'付尾款审核中'
+		when 9 then '完成'
+		when 10 then '付尾款审核拒绝'
+		when 11 then '超时过期'
+		when
+		12 then '延期'
+		when 13 then '延期申请中'
+		when 14 then '延期拒绝'
+		end as orderstatename,
+		CONVERT(varchar,
+		Order_time, 120 ) as ordertime,
+		Order_sh_info as ordershinfo,
+		bz as bz
+		from tower_sh_doinfo
+		where Order_id=#{orderid}
+		order by Order_time desc
+		;
+	</select>
+	
+	<insert id="insertTowerShInfo" parameterType="com.sdtower.common.bean.TowerShInfo">
+	
+	insert into tower_sh_doinfo
+	(Order_id,Order_user,order_name,order_phone,Order_type,order_state,order_time,Order_sh_info)
+	values
+	(#{orderid},#{orderuser},#{ordername},#{orderphone},#{ordertype},#{orderstate},GETDATE(),#{ordershinfo})
+	
+	
+	</insert>
+
+</mapper>
